@@ -1,8 +1,8 @@
 //-------------------------On Load
 author = "alganthe";								// Visible when loading mission
-onLoadName = "Co-Ops";								// Visible when loading mission
+onLoadName = "Co-Ops (TFT edit)";								// Visible when loading mission
 OnLoadMission = "";
-loadScreen = "";
+loadScreen = "ifrit.jpg";
 overviewPicture = "";
 
 onLoadIntro = "";										// Displays a message while the intro is loading.
@@ -25,7 +25,7 @@ enableDebugConsole = 1; 								// 0 = editor default behavior, 1 = SP / Hosts /
 
 //-------------------------Respawn
 respawn = 3;
-respawnDelay = 10;
+respawnDelay = 30;
 respawnTemplates[] = {"Revive", "MenuPosition"};
 
 reviveDelay = 30;		// The time it takes to revive a unit. Will be halved if you have a Medikit. (Default: 6 seconds.)
@@ -34,9 +34,9 @@ reviveBleedOutDelay = 300;	// The time it takes for a unit to bleed out. (Defaul
 
 //-------------------------Wreck Manager
 wreckManagerMode = 1;
-wreckLimit = 5;
-wreckRemovalMinTime = 20;
-wreckRemovalMaxTime = 150;
+wreckLimit = 10;
+wreckRemovalMinTime = 30;
+wreckRemovalMaxTime = 300;
 
 //-------------------------Corpse Manager
 corpseManagerMode = 1;
@@ -44,11 +44,15 @@ corpseLimit = 20;
 corpseRemovalMinTime = 10;
 corpseRemovalMaxTime = 600;
 
+//-------------------------VAS
+#include "VAS\menu.hpp"
+
 //-------------------------Functions
 #include "functions\misc\taw_vd\GUI.h"
 
 class CfgFunctions {
 	#include "functions\functions.hpp"
+    #include "VAS\cfgfunctions.hpp"
 };
 
 //---------------------------Mission Parameters
@@ -80,7 +84,7 @@ class Params {
 		title = "Filter mode of the arsenal";
 		texts[] = {"Arsenal disabled", "Arsenal enabled but filtered", "Arsenal enabled"};
 		values[] = {0, 1, 2};
-		default = 1;
+		default = 2;
 		function = "derp_fnc_VAInitSorting";
 	};
 
@@ -88,7 +92,7 @@ class Params {
         title = "Enable para jumps on AO?";
         texts[] = {"No", "Yes"};
         values[] = {0, 1};
-        default = 0;
+        default = 1;
     };
 
 	class VehicleRespawnDistance {
@@ -102,56 +106,56 @@ class Params {
 		title = "Size of the AOs";
 		values[] = {500, 600, 700, 800, 900, 1000, 1200, 1400, 1600, 1800, 2000};
 		texts[] = {"500m", "600m", "700m", "800m", "900m", "1km", "1.2km", "1.4km", "1.6km", "1.8km", "2km"};
-		default = 1000;
+		default = 600;
 	};
 
 	class MissionAmount {
 		title = "Amount of AOs before mission ends";
 		values[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 		texts[] = {"Disabled", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
-		default = 0;
+		default = 6;
 	};
 
     class smRewardAfter {
         title = "Amount of side missions before recieving a reward";
 		values[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 		texts[] = {"Rewards disabled", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
-		default = 2;
+		default = 1;
     };
 
     class AntiAirAmount {
         title = "Amount of AA vehicles on the main AO";
 		values[] = {1, 2, 3, 4, 5, 6};
 		texts[] = {"1", "2", "3", "4", "5", "6"};
-		default = 3;
+		default = 2;
     };
 
     class MRAPAmount {
         title = "Amount of MRAPs on the main AO";
         values[] = {1, 2, 3, 4, 5, 6};
         texts[] = {"1", "2", "3", "4", "5", "6"};
-        default = 3;
+        default = 1;
     };
 
     class RandomVehcsAmount {
         title = "Amount of random vehicles on the main AO";
         values[] = {1, 2, 3, 4, 5, 6};
         texts[] = {"1", "2", "3", "4", "5", "6"};
-        default = 3;
+        default = 2;
     };
 
     class InfantryGroupsAmount {
         title = "Amount of infantry groups on the main AO";
         values[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
         texts[] = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
-        default = 6;
+        default = 4;
     };
 
     class AAGroupsAmount {
         title = "Amount of AA groups on the main AO";
         values[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
         texts[] = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
-        default = 2;
+        default = 1;
     };
 
     class ATGroupsAmount {
@@ -165,7 +169,7 @@ class Params {
         title = "Enemy air reinforcements timer";
         values[] = {300, 600, 900};
         texts[] = {"5 minutes", "10 minutes", "15 minutes"};
-        default = 300;
+        default = 600;
     };
 
     class AIAimingAccuracy {
@@ -179,7 +183,7 @@ class Params {
         title = "AI aiming shake";
         values[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
         texts[] = {"0.1", "0.2", "0.3", "0.4", "0.5", "0.6", "0.7", "0.8", "0.9", "1"};
-        default = 5;
+        default = 6;
     };
 
     class AIAimingSpeed {
@@ -213,21 +217,21 @@ class Params {
         title = "AI courage";
         values[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
         texts[] = {"0.1", "0.2", "0.3", "0.4", "0.5", "0.6", "0.7", "0.8", "0.9", "1"};
-        default = 6;
+        default = 8;
     };
 
     class AIReloadSpeed {
         title = "AI reload speed";
         values[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
         texts[] = {"0.1", "0.2", "0.3", "0.4", "0.5", "0.6", "0.7", "0.8", "0.9", "1"};
-        default = 4;
+        default = 10;
     };
 
     class AICommandingSkill {
         title = "AI commanding skill";
         values[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
         texts[] = {"0.1", "0.2", "0.3", "0.4", "0.5", "0.6", "0.7", "0.8", "0.9", "1"};
-        default = 7;
+        default = 9;
     };
 
     class AIGeneralSkill {

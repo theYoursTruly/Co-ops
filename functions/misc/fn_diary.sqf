@@ -10,22 +10,16 @@
 */
 waitUntil {!isNull player};
 
-player createDiarySubject ["rules", "Rules"];
 player createDiarySubject ["teamspeak", "Teamspeak"];
 player createDiarySubject ["credits", "Credits"];
 player createDiarySubject ["current issues", "Current issues"];
-
-//-------------------------------------------------- Rules
-player createDiaryRecord ["rules", ["Enforcement",
-"your rules here"
-]];
 
 //-------------------------------------------------- Teamspeak
 player createDiaryRecord ["teamspeak", ["TS3",
 "
 <br/> Teamspeak:
 <br/> http://www.teamspeak.com/?page=downloads
-<br/> your adress here
+<br/> ts3.tft8.com
 "
 ]];
 

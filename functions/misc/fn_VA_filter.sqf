@@ -269,5 +269,6 @@ switch (_filter) do {
 
     case (2): {
         ["AmmoboxInit", [_box, true, {true}]] call BIS_fnc_arsenal;
+        [_box, ["<t color='#f78f33'>Virtual Ammobox</t>", "VAS\open.sqf", nil, 50, true, true, "", "_target distance _this < 8"]] remoteExec ["addAction", -2, true];
     };
 };

@@ -31,11 +31,6 @@ if !(isServer or hasInterface) then {
     };
 
     //---------------- class specific stuff
-    _pilotsClassnames = ["B_pilot_F","B_Helipilot_F"];
-    if ((typeOf player) in _pilotsClassnames) then {
-        [player, "pilotRespawn"] call BIS_fnc_addRespawnPosition;
-    };
-
     if (player isKindOf "B_support_Mort_f") then {
     	enableEngineArtillery true;
     } else {
@@ -52,7 +47,7 @@ if !(isServer or hasInterface) then {
         }}];
 
     if (PARAM_paraJumpEnabled) then {
-        arsenalDude addAction [
+        paraPoint addAction [
         "<t color='#FF6600'>Paradrop on AO</t>",
         {
             [player,
