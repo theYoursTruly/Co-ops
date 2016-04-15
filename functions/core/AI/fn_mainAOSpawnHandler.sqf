@@ -22,7 +22,12 @@
 * 8: Urban groups amount <SCALAR> (OPTIONNAL)
 *
 * Return Value:
-* Array of units created
+* Array of units created if executed on the server
+* Nothing if executed anywhere else (it publicVarServer the array of spawned units instead)
+*
+* Example:
+*
+*[_pos, [true, true, false, true, true, true, true, false], 2, 1, 3, 5, 1, 1, 3] call derp_fnc_mainAOSpawnHandler;
 */
 #define MRAPList ["O_MRAP_02_gmg_F", "O_MRAP_02_hmg_F"]
 #define VehicleList ["O_MBT_02_cannon_F", "O_APC_Tracked_02_cannon_F", "O_APC_Wheeled_02_rcws_F", "O_APC_Tracked_02_cannon_F"]
@@ -30,7 +35,7 @@
 #define InfantryGroupList ["OIA_InfSquad", "OIA_InfSquad_Weapons", "OIA_InfAssault", "OIA_ReconSquad"]
 #define MilitaryBuildings ["Land_Cargo_House_V1_F", "Land_Cargo_House_V2_F", "Land_Cargo_House_V3_F", "Land_Medevac_house_V1_F", "Land_Research_house_V1_F", "Land_Cargo_HQ_V1_F", "Land_Cargo_HQ_V2_F", "Land_Cargo_HQ_V3_F", "Land_Research_HQ_F", "Land_Medevac_HQ_V1_F", "Land_Cargo_Patrol_V1_F", "Land_Cargo_Patrol_V2_F", "Land_Cargo_Patrol_V3_F", "Land_Cargo_Tower_V1_F", "Land_Cargo_Tower_V2_F", "Land_Cargo_Tower_V3_F"]
 
-params ["_AOpos", "_settingsArray", ["_radiusSize", PARAM_AOSize], ["_AAAVehcAmount", PARAM_AntiAirAmount], ["_MRAPAmount", PARAM_MRAPAmount], ["_randomVehcsAmount", PARAM_RandomVehcsAmount], ["_infantryGroupsAmount", PARAM_InfantryGroupsAmount], ["_AAGroupsAmount", PARAM_AAGroupsAmount], ["_ATGroupsAmount", PARAM_ATGroupsAmount], ["_urbanInfantryAmount", 2]];
+params ["_AOpos", "_settingsArray", ["_radiusSize", derp_PARAM_AOSize], ["_AAAVehcAmount", derp_PARAM_AntiAirAmount], ["_MRAPAmount", derp_PARAM_MRAPAmount], ["_randomVehcsAmount", derp_PARAM_RandomVehcsAmount], ["_infantryGroupsAmount", derp_PARAM_InfantryGroupsAmount], ["_AAGroupsAmount", derp_PARAM_AAGroupsAmount], ["_ATGroupsAmount", derp_PARAM_ATGroupsAmount], ["_urbanInfantryAmount", 2]];
 _settingsArray params [["_AAAVehcSetting", false], ["_MRAPSetting", false], ["_randomVehcsSetting", false], ["_infantryGroupsSetting", false], ["_AAGroupsSetting", false], ["_ATGroupsSetting", false], ["_urbanInfantrySetting", false], ["_milbuildingInfantry", false]];
 
 private _spawnedUnits = [];
@@ -55,7 +60,7 @@ if (_AAAVehcSetting) then {
 
         _group = group _AAVehicle;
 
-        [_group, _AOpos, 500] call BIS_fnc_taskPatrol;
+        [_group, _AOpos, _radiusSize / 2] call BIS_fnc_taskPatrol;
         _group setSpeedMode "LIMITED";
     };
 };
@@ -78,7 +83,7 @@ if (_MRAPSetting) then {
 
         _group = group _MRAP;
 
-        [_group, _AOpos, 300] call BIS_fnc_taskPatrol;
+        [_group, _AOpos, _radiusSize / 3] call BIS_fnc_taskPatrol;
         _group setSpeedMode "LIMITED";
     };
 };
@@ -99,7 +104,7 @@ if (_randomVehcsSetting) then {
         } foreach (crew _vehc);
         _group = group _vehc;
 
-        [_group, _AOpos, 500] call BIS_fnc_taskPatrol;
+        [_group, _AOpos, _radiusSize / 2] call BIS_fnc_taskPatrol;
         _group setSpeedMode "LIMITED";
     };
 };
@@ -110,7 +115,7 @@ if (_infantryGroupsSetting) then {
         _randomPos = [[[_AOpos, _radiusSize * 1.2], []], ["water", "out"]] call BIS_fnc_randomPos;
         _infantryGroup = [_randomPos, EAST, (configfile >> "CfgGroups" >> "East" >> "OPF_F" >> "Infantry" >> (selectRandom InfantryGroupList))] call BIS_fnc_spawnGroup;
 
-        [_infantryGroup, _AOpos, 650] call BIS_fnc_taskPatrol;
+        [_infantryGroup, _AOpos, _radiusSize / 1.6] call BIS_fnc_taskPatrol;
 
         {
             _spawnedUnits pushBack _x;
@@ -125,7 +130,7 @@ if (_AAGroupsSetting) then {
         _randomPos = [[[_AOpos, _radiusSize], []], ["water", "out"]] call BIS_fnc_randomPos;
         _infantryGroup = [_randomPos, EAST, (configfile >> "CfgGroups" >> "East" >> "OPF_F" >> "Infantry" >> "OIA_InfTeam_AA")] call BIS_fnc_spawnGroup;
 
-        [_infantryGroup, _AOpos, 650] call BIS_fnc_taskPatrol;
+        [_infantryGroup, _AOpos, _radiusSize / 1.6] call BIS_fnc_taskPatrol;
 
         {
             _spawnedUnits pushBack _x;
@@ -140,7 +145,7 @@ if (_ATGroupsSetting) then {
         _randomPos = [[[_AOpos, _radiusSize], []], ["water", "out"]] call BIS_fnc_randomPos;
         _infantryGroup = [_randomPos, EAST, (configfile >> "CfgGroups" >> "East" >> "OPF_F" >> "Infantry" >> "OIA_InfTeam_AT")] call BIS_fnc_spawnGroup;
 
-        [_infantryGroup, _AOpos, 650] call BIS_fnc_taskPatrol;
+        [_infantryGroup, _AOpos, _radiusSize / 1.6] call BIS_fnc_taskPatrol;
 
         {
             _spawnedUnits pushBack _x;
@@ -191,16 +196,16 @@ if (_milbuildingInfantry) then {
     };
 };
 
-//-------------------------------------------------- Add every spawned unit to zeus
-{
-    _x addCuratorEditableObjects [_spawnedUnits, false];
-} forEach allCurators;
-
+//-------------------------------------------------- SetSkill + network operations
 [_AISkillUnitsArray] call derp_fnc_AISkill;
 
 if (isServer) then {
+    {
+        _x addCuratorEditableObjects [_spawnedUnits, true];
+    } foreach allCurators;
     _spawnedUnits
 } else {
+    [_spawnedUnits, true] remoteExec ["derp_fnc_remoteAddCuratorEditableObjects", 2];
     spawnedUnits = _spawnedUnits;
     publicVariableServer "spawnedUnits";
     spawnedUnits = nil;

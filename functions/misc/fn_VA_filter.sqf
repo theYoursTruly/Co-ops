@@ -1,32 +1,35 @@
 /*
 * Author: alganthe
-* Filter the arsenal for a given box
+* Filter the arsenal for a given box and add an unfucked arsenal action
 *
 * Arguments:
-* 0: Box <OBJECT>
+* 0: Array of objects <ARRAY>
 * 1: filter <NUMBER 0: arsenal unavailable, 1: Arsenal available but filtered, 2: arsenal available unfiltered>
 *
 * Return Value:
-* Array of items added in the form of ["item1","item2",......"itemN"]
+* Nothing
 *
 * Example:
-*
 * [_this,1] call derp_fnc_VA_filter;
 */
-params ["_box", "_filter"];
+params ["_arsenalBoxes", "_filter"];
 
 switch (_filter) do {
 
-    case (0): {
-        [_box, [true], true] call BIS_fnc_removeVirtualItemCargo;
-        [_box, [true], true] call BIS_fnc_removeVirtualWeaponCargo;
+    case 0: {
+        {
+            [_x , [true], true] call BIS_fnc_removeVirtualItemCargo;
+            [_x, [true], true] call BIS_fnc_removeVirtualWeaponCargo;
+        } foreach _arsenalBoxes;
     };
 
-    case (1): {
-        ["AmmoboxInit", [_box, true, {true}]] call BIS_fnc_arsenal;
-        [_box, [true], true] call BIS_fnc_removeVirtualItemCargo;
-        [_box, [true], true] call BIS_fnc_removeVirtualWeaponCargo;
-        [_box, [true], true] call BIS_fnc_removeVirtualBackpackCargo;
+    case 1: {
+        {
+            ["AmmoboxInit", [_x, true, {true}]] call BIS_fnc_arsenal;
+            [_x, [true], true] call BIS_fnc_removeVirtualItemCargo;
+            [_x, [true], true] call BIS_fnc_removeVirtualWeaponCargo;
+            [_x, [true], true] call BIS_fnc_removeVirtualBackpackCargo;
+        } foreach _arsenalBoxes;
 
         _weaponsBlacklist = [
             //------------------------- Weapons with blacklisted scoeps
@@ -55,11 +58,8 @@ switch (_filter) do {
             "optic_Nightstalker",
             "optic_tws",
             "optic_tws_mg",
-            "optic_LRPS",
-            "optic_SOS",
 
             //------------------------- UAV terminals
-            "B_UavTerminal",
             "O_UavTerminal",
             "I_UavTerminal",
 
@@ -76,17 +76,9 @@ switch (_filter) do {
             "U_I_HeliPilotCoveralls",
 
             //------------------------- Ghilies
-            "U_O_FullGhillie_ard",
-            "U_I_FullGhillie_ard",
             "U_B_FullGhillie_ard",
-            "U_O_FullGhillie_lsh",
-            "U_I_FullGhillie_lsh",
             "U_B_FullGhillie_lsh",
-            "U_I_FullGhillie_sard",
-            "U_O_FullGhillie_sard",
             "U_B_FullGhillie_sard",
-            "U_O_GhillieSuit",
-            "U_I_GhillieSuit",
             "U_B_GhillieSuit",
 
             //------------------------- Wetsuits
@@ -262,13 +254,53 @@ switch (_filter) do {
         _availableItems = _availableItems - _weaponsBlacklist;
         _availableItems = _availableItems - _backpackBlackList;
 
-        [_box,_availableItems, true] call BIS_fnc_addVirtualItemCargo;
-        [_box,_availableItems, true] call BIS_fnc_addVirtualWeaponCargo;
-        [_box,_availableItems, true] call BIS_fnc_addVirtualBackpackCargo;
+        {
+            [_x, _availableItems, true] call BIS_fnc_addVirtualItemCargo;
+            [_x, _availableItems, true] call BIS_fnc_addVirtualWeaponCargo;
+            [_x, _availableItems, true] call BIS_fnc_addVirtualBackpackCargo;
+        } foreach _arsenalBoxes;
+
+        {
+            _x removeAction (_x getVariable "bis_fnc_arsenal_action");
+            _action = _x addaction [
+            localize "STR_A3_Arsenal",
+
+            {
+                params ["_box", "_unit"];
+                ["Open", [nil, _box, _unit]] call bis_fnc_arsenal;
+
+                [_unit] spawn {
+                    params ["_unit"];
+
+                    uiSleep 2;
+                    (uinamespace getvariable "bis_fnc_arsenal_display") displayAddEventHandler ["Unload", {
+                        [player, 0] call derp_fnc_gearLimitations;
+                    }];
+                };
+            },
+            [],
+            6,
+            true,
+            false,
+            "",
+            "
+                _cargo = _target getvariable ['bis_addVirtualWeaponCargo_cargo',[[],[],[],[]]];
+                if ({count _x > 0} count _cargo == 0) then {
+                _target removeaction (_target getvariable ['bis_fnc_arsenal_action',-1]);
+                _target setvariable ['bis_fnc_arsenal_action',nil];
+                };
+                _condition = _target getvariable ['bis_fnc_arsenal_condition',{true}];
+                alive _target && {_target distance _this < 5} && {call _condition}
+            "
+            ];
+            _x setvariable ["bis_fnc_arsenal_action", _action];
+        } foreach _arsenalBoxes;
     };
 
-    case (2): {
-        ["AmmoboxInit", [_box, true, {true}]] call BIS_fnc_arsenal;
-        [_box, ["<t color='#f78f33'>Virtual Ammobox</t>", "VAS\open.sqf", nil, 50, true, true, "", "_target distance _this < 8"]] remoteExec ["addAction", -2, true];
+    case 2: {
+        {
+            ["AmmoboxInit", [_x, true, {true}]] call BIS_fnc_arsenal;
+            [_x, ["<t color='#f78f33'>Virtual Ammobox</t>", "VAS\open.sqf", nil, 50, true, true, "", "_target distance _this < 8"]] remoteExec ["addAction", -2, true];
+        } foreach _arsenalBoxes;
     };
 };

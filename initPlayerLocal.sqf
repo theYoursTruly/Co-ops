@@ -14,20 +14,18 @@ if !(isServer or hasInterface) then {
 
     ["InitializePlayer", [player]] call BIS_fnc_dynamicGroups; // Dynamic groups init
 
-    [] execVM "scripts\misc\QS_icons.sqf";
+    [] execVM "scripts\misc\QS_icons.sqf";  // Map icons
 
-    {
-        _x addCuratorEditableObjects [[player], false];
-    } forEach allCurators;
+    [[player], false] call derp_fnc_remoteAddCuratorEditableObjects; // Add unit to zeus.
     //---------------- mission params
     if (("staminaEnabled" call BIS_fnc_getParamValue) == 0) then {
         player enableStamina false;
     };
 
     if (("paraJumpEnabled" call BIS_fnc_getParamValue) == 1) then {
-        PARAM_paraJumpEnabled = true;
+        derp_PARAM_paraJumpEnabled = true;
     } else {
-        PARAM_paraJumpEnabled = false;
+        derp_PARAM_paraJumpEnabled = false;
     };
 
     //---------------- class specific stuff
@@ -46,7 +44,19 @@ if !(isServer or hasInterface) then {
             ["Don't goof at base", "Hold your horses soldier, don't throw, fire or place anything inside the base."] remoteExecCall ["derp_fnc_hintC", _unit];
         }}];
 
-    if (PARAM_paraJumpEnabled) then {
+    player addEventHandler ["Take", {
+        params ["_unit", "_container", "_item"];
+
+        [_unit, 1, _item, _container] call derp_fnc_gearLimitations;
+    }];
+
+    player addEventHandler ["InventoryClosed", {
+        params ["_unit"];
+
+        [_unit, 0] call derp_fnc_gearLimitations;
+    }];
+
+	if (derp_PARAM_paraJumpEnabled) then {
         paraPoint addAction [
         "<t color='#FF6600'>Paradrop on AO</t>",
         {
@@ -62,4 +72,6 @@ if !(isServer or hasInterface) then {
         "(!isNil 'missionInProgress') && {missionInProgress} && {!isNil 'derp_paraPos'}"
         ];
     };
+
+    call derp_fnc_VAInitSorting;  // Init arsenal boxes.
 };

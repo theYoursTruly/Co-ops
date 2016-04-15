@@ -1,6 +1,6 @@
 /*
 * Author: alganthe
-* Add a quad with the required parameters to the quad handling pfh.
+* Add a quad with the required parameters to the quad handling PFH.
 *
 * Arguments:
 * 0: quad to be added <OBJECT>
