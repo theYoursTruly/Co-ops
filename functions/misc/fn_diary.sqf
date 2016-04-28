@@ -27,13 +27,13 @@ player createDiaryRecord ["teamspeak", ["TS3",
 player createDiaryRecord ["Co-ops", ["FAQ",
 "
 <br/> Q: How do I paradrop?
-<br/> A: If it's enabled talk to the arsenal guy when an AO is up, an action will show up.
+<br/> A: If it's enabled find the signed marked with a parachute. When an AO is up, an action will show up.
 <br/>
 <br/> Q: Why is my view distance is really low even when my video options says it's high?
 <br/> A: Scroll down and click on view settings.
 <br/>
 <br/> Q: How long do vehicles take to respawn?
-<br/> A: It can vary from server to server, it's highly configurable, ask on side chat.
+<br/> A: It can vary from server to server, it's highly configurable, be patient.
 "
 ]];
 
