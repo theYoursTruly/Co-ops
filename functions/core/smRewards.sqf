@@ -1,4 +1,14 @@
-if (derp_successfulSMs != 0 && {derp_successfulSMs == PARAM_smRewardAfter}) then {
+/*
+* Author: alganthe
+* Called only after a successful side mission, this gives a reward if the number of successfully completed SMs is equal to the mission param
+*
+* Arguments:
+* None
+*
+* Return Value:
+* Nothing
+*/
+if (derp_successfulSMs != 0 && {derp_successfulSMs == derp_PARAM_smRewardAfter}) then {
     _smRewardList = [
         ["B_Heli_Light_01_armed_F", 2],
         ["B_Heli_Attack_01_F", 2],
@@ -29,14 +39,14 @@ if (derp_successfulSMs != 0 && {derp_successfulSMs == PARAM_smRewardAfter}) then
     _reward = selectRandom _selectRandomArray;
 
     if (_reward isKindOf "Helicopter") then {
-        _heloReward = createVehicle [_reward, sm_heliRewardPad, [], 0, "NONE"];
-        _heloReward setDir (getDir sm_heliRewardPad);
+        _heloReward = createVehicle [_reward, getMarkerPos "smReward_Helo", [], 0, "NONE"];
+        _heloReward setDir (markerDir "smReward_Helo");
         _heloReward call derp_fnc_vehicleSetup;
     };
 
     if (_reward isKindOf "Plane") then {
         _planeReward = createVehicle [_reward, getMarkerPos "smReward_Plane", [], 0, "NONE"];
-        _planeReward setDir (getDir smReward_Plane_hangar);
+        _planeReward setDir (markerDir "smReward_Plane");
         _planeReward call derp_fnc_vehicleSetup;
     };
 
