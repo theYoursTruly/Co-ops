@@ -16,7 +16,6 @@
 * Example:
 * [position, nil, [unit1, unit2, unit3, unitN], 200, 1, false] call derp_fnc_AIOccupyBuilding
 */
-
 params ["_startingPos", ["_buildingTypes", ["house"]], "_unitsArray", ["_fillingRadius", -1], ["_fillingType", 0], ["_topDownFilling", false]];
 
 if (_startingPos isEqualTo [0,0,0]) exitWith {
@@ -110,8 +109,7 @@ While {count _unitsArray > 0} do {
 
                     _unit setPos _buildingPos;
 
-                    doStop _unit;
-                    commandStop _unit;
+                    _unit forceSpeed 0;
 
                     _unitsArray deleteAt (_unitsArray find _unit);
                     _buildingsIndexes deleteAt (_buildingsIndexes find _buildingsPositions);
@@ -144,8 +142,7 @@ While {count _unitsArray > 0} do {
 
                     _unit setPos _buildingPos;
 
-                    doStop _unit;
-                    commandStop _unit;
+                    _unit forceSpeed 0;
 
                     _unitsArray deleteAt (_unitsArray find _unit);
                     _buildingsIndexes = _buildingsIndexes apply {_x select {!(_x isEqualTo _buildingPos)}};
@@ -180,8 +177,7 @@ While {count _unitsArray > 0} do {
 
                     _unit setPos _buildingPos;
 
-                    doStop _unit;
-                    commandStop _unit;
+                    _unit forceSpeed 0;
 
                     _unitsArray deleteAt (_unitsArray find _unit);
                     _buildingsIndexes = _buildingsIndexes apply {_x select {!(_x isEqualTo _buildingPos)}};

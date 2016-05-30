@@ -1,3 +1,4 @@
+#include "..\..\defines.hpp"
 /*
 * Author: alganthe
 * Retrieve a truck full of ammo.
@@ -19,10 +20,11 @@ params ["_AOPos", "_missionID"];
 derp_SMID = derp_SMID + 1;
 _smID = "truckRetrieval" + str derp_SMID;
 
-[west, [_smID, _missionID], ["A truck full GBUs got spotted in the AO, secure it and bring it back to the return point so we can dismantle them. The destruction of the vehicle will result in the failure of the mission.", "Retrieve ammo truck", ""], objNull, "Created", 5, true, "Default", true] call BIS_fnc_taskCreate;
+[west, [_smID, _missionID], ["A truck full GBUs got spotted in the AO, secure it and bring it back to the return point so we can dismantle them. The destruction of the vehicle will result in the failure of the mission.", "Retrieve ammo truck", ""], objNull, "Created", 5, true, "search", true] call BIS_fnc_taskCreate;
 
-_spawnPos = _AOPos findEmptyPosition [10,200,"O_Truck_03_ammo_F"];
-_ammoTruck = "O_Truck_03_ammo_F" createVehicle _spawnPos;
+_usedTruck = selectRandom TRUCKSMTruck;
+_spawnPos = _AOPos findEmptyPosition [10, 200, _usedTruck];
+_ammoTruck = _usedTruck createVehicle _spawnPos;
 _ammoTruck setAmmoCargo 0;
 
 {
@@ -60,7 +62,7 @@ _ammoTruck addEventHandler ["Killed", {
 
         derp_successfulSMs = derp_successfulSMs + 1;
         call derp_fnc_smRewards;
-        _pfhID call CBA_fnc_removePerFrameHandler;
+        _pfhID call derp_fnc_removePerFrameHandler;
     };
 
     if (!alive _ammoTruck) then {
@@ -77,10 +79,10 @@ _ammoTruck addEventHandler ["Killed", {
 
             [_smID, true] call BIS_fnc_deleteTask;
 
-        }, [_ammoTruck, _smID], 300] call derp_fnc_waitAndExec;
-        _pfhID call CBA_fnc_removePerFrameHandler;
+        }, [_ammoTruck, _smID], 300] call derp_fnc_waitAndExecute;
+        _pfhID call derp_fnc_removePerFrameHandler;
 
     } else {
         [_AOPos] call derp_fnc_airReinforcements;
     };
-}, 10, [_AOPos, _ammoTruck, _smID]] call CBA_fnc_addPerFrameHandler;
+}, 10, [_AOPos, _ammoTruck, _smID]] call derp_fnc_addPerFrameHandler;

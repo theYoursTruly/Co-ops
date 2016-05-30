@@ -20,7 +20,7 @@ params ["_AOPos", "_comTowers", "_missionID"];
 derp_SMID = derp_SMID + 1;
 _smID = "antennaTask" + str derp_SMID;
 
-[west, [_smID, _missionID], ["The CSAT have took control of a few antennas, destroy them or they'll call air support. We've marked their locations on your map.", "Destroy enemy AO com array", ""], objNull, "Created", 5, true, "Destroy", true] call BIS_fnc_taskCreate;
+[west, [_smID, _missionID], ["Our enemies have took control of a few antennas, destroy them or they'll call air support. We've marked their locations on your map.", "Destroy enemy com array", ""], objNull, "Created", 5, true, "destroy", true] call BIS_fnc_taskCreate;
 
 //------------------- Markers + mines
 private _towerMines = [];
@@ -66,13 +66,13 @@ private _markerArray = [];
 
             [_smID, true] call BIS_fnc_deleteTask;
 
-        }, [_towerMines, _smID], 300] call derp_fnc_waitAndExec;
+        }, [_towerMines, _smID], 300] call derp_fnc_waitAndExecute;
 
         derp_successfulSMs = derp_successfulSMs + 1;
         call derp_fnc_smRewards;
-        _pfhID call CBA_fnc_removePerFrameHandler;
+        _pfhID call derp_fnc_removePerFrameHandler;
 
     } else {
         [_AOPos] call derp_fnc_airReinforcements;
     };
-}, 10, [_comTowers, _AOPos, _markerArray, _towerMines, _smID]] call CBA_fnc_addPerFrameHandler;
+}, 10, [_comTowers, _AOPos, _markerArray, _towerMines, _smID]] call derp_fnc_addPerFrameHandler;

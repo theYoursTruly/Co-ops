@@ -29,13 +29,27 @@ if !(isServer or hasInterface) then {
     };
 
     //---------------- class specific stuff
-    if (player isKindOf "B_support_Mort_f") then {
+
+     // Disable arty computer for non FSG members
+    if (player getUnitTrait "derp_mortar") then {
     	enableEngineArtillery true;
     } else {
     	enableEngineArtillery false;
     };
 
     //---------------- EHs and addactions
+    player addEventHandler ["GetInMan", {
+        _this call derp_fnc_pilotCheck;
+    }];
+
+    player addEventHandler ["SeatSwitchedMan", {
+        if !((_this select 3) isKindOf "Air") exitWith {};
+        _this params ["_unit1", "", "_vehicle"];
+        _seat = ((fullCrew _vehicle) select {_x select 0 == _unit1}) select 0;
+        [(_seat select 0), (_seat select 1), _vehicle, (_seat select 3)] call derp_fnc_pilotCheck;
+
+    }];
+
     player addEventHandler ["Fired", {
         params ["_unit", "_weapon", "", "", "", "", "_projectile"];
 
@@ -44,6 +58,7 @@ if !(isServer or hasInterface) then {
             ["Don't goof at base", "Hold your horses soldier, don't throw, fire or place anything inside the base."] remoteExecCall ["derp_fnc_hintC", _unit];
         }}];
 
+    if ("ArsenalFilter" call BIS_fnc_getParamValue == 1) then {
     player addEventHandler ["Take", {
         params ["_unit", "_container", "_item"];
 
@@ -55,23 +70,29 @@ if !(isServer or hasInterface) then {
 
         [_unit, 0] call derp_fnc_gearLimitations;
     }];
-
-	if (derp_PARAM_paraJumpEnabled) then {
-        paraPoint addAction [
-        "<t color='#FF6600'>Paradrop on AO</t>",
-        {
-            [player,
-              2 * ("AOSize" call BIS_fnc_getParamValue)
-            ] call derp_fnc_paradrop;
-        },
-        nil,
-        0,
-        true,
-        true,
-        "",
-        "(!isNil 'missionInProgress') && {missionInProgress} && {!isNil 'derp_paraPos'}"
-        ];
     };
 
-    call derp_fnc_VAInitSorting;  // Init arsenal boxes.
+	if (derp_PARAM_paraJumpEnabled) then {
+        {
+	        paraPoint addAction [
+	            format["<t color='#FF6600'>Paradrop on AO (%1m high)</t>", _x],
+		        {
+		            [player,
+		                  2 * ("AOSize" call BIS_fnc_getParamValue),
+		                  _this select 3
+		            ] call derp_fnc_paradrop;
+		        },
+	            _x,
+		        0,
+		        true,
+		        true,
+		        "",
+		        "(!isNil 'missionInProgress') && {missionInProgress} && {!isNil 'derp_paraPos'}"
+	        ];
+        } forEach [250, 500, 750, 1000];
+    };
+
+    if (getMissionConfigValue "respawnOnStart" == -1) then {[player] call derp_revive_fnc_reviveActions};
+
+    [[arsenalBox1, arsenalBox2, arsenalDude], ("ArsenalFilter" call BIS_fnc_getParamValue)] call derp_fnc_VA_filter;;  // Init arsenal boxes.
 };

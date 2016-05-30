@@ -10,7 +10,7 @@
 * Nothing
 *
 * Example:
-* [_this,1] call derp_fnc_VA_filter;
+* [_this, 1] call derp_fnc_VA_filter;
 */
 params ["_arsenalBoxes", "_filter"];
 
@@ -105,16 +105,6 @@ switch (_filter) do {
             "U_C_Driver_4",
             "U_C_Driver_1_white",
             "U_C_Driver_1_yellow",
-
-            //------------------------- Guerilla clothes
-            "U_BG_Guerilla1_1",
-            "U_BG_Guerilla2_1",
-            "U_BG_Guerilla2_2",
-            "U_BG_Guerilla2_3",
-            "U_BG_Guerilla3_1",
-            "U_BG_Guerilla3_2",
-            "U_BG_Guerrilla_6_1",
-            "U_BG_leader",
 
             //------------------------- random
             "U_C_HunterBody_grn",
@@ -299,8 +289,8 @@ switch (_filter) do {
 
     case 2: {
         {
-            ["AmmoboxInit", [_x, true, {true}]] call BIS_fnc_arsenal;
-            [_x, ["<t color='#f78f33'>Virtual Ammobox</t>", "VAS\open.sqf", nil, 50, true, true, "", "_target distance _this < 8"]] remoteExec ["addAction", -2, true];
+            _x addAction [localize "STR_A3_Arsenal", { ["Open", [true]] call bis_fnc_arsenal; }];
+            _x addAction ["<t color='#f78f33'>Virtual Ammobox</t>", "VAS\open.sqf", nil, 50, true, true, "", "_target distance _this < 8"];
         } foreach _arsenalBoxes;
     };
 };
