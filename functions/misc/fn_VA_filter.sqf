@@ -291,6 +291,7 @@ switch (_filter) do {
         {
             _x addAction [localize "STR_A3_Arsenal", { ["Open", [true]] call bis_fnc_arsenal; }];
             _x addAction ["<t color='#f78f33'>Virtual Ammobox</t>", "VAS\open.sqf", nil, 50, true, true, "", "_target distance _this < 8"];
+			_x addAction ["<t color='#006bb3'>Save gear</t>", { player setVariable ["derp_savedGear", (getUnitLoadout player)]; systemChat "Gear saved"; }];
         } foreach _arsenalBoxes;
     };
 };
